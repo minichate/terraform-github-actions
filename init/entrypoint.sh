@@ -24,6 +24,7 @@ ${GITHUB_DEPLOY_PRIVATE_KEY}
 EOF
   chmod 600 ~/.ssh/deploy_key
   ssh-add ~/.ssh/deploy_key
+  ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
 fi
 
 if [[ ! -z "$GOOGLE_CLOUD_KEYFILE_JSON" ]]; then
