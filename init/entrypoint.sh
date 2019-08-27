@@ -18,13 +18,13 @@ fi
 
 if [[ ! -z "$GITHUB_DEPLOY_PRIVATE_KEY" ]]; then
   mkdir -p ~/.ssh
+  ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
   eval "$(ssh-agent -s)"
   cat > ~/.ssh/deploy_key << EOF
 ${GITHUB_DEPLOY_PRIVATE_KEY}
 EOF
   chmod 600 ~/.ssh/deploy_key
   ssh-add ~/.ssh/deploy_key
-  ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
 fi
 
 if [[ ! -z "$GOOGLE_CLOUD_KEYFILE_JSON" ]]; then
