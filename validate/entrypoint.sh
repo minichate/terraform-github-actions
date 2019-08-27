@@ -12,6 +12,28 @@ if [[ ! -z "$TF_ACTION_WORKSPACE" ]] && [[ "$TF_ACTION_WORKSPACE" != "default" ]
   terraform workspace select "$TF_ACTION_WORKSPACE"
 fi
 
+if [[ ! -z "$GITHUB_DEPLOY_PRIVATE_KEY" ]]; then
+  mkdir -p ${HOME}/.ssh
+  ssh-keyscan -t rsa github.com >> /etc/ssh/ssh_known_hosts
+  chmod 644 /etc/ssh/ssh_known_hosts
+
+  cat > /etc/ssh/ssh_config << EOF
+Host *
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null
+EOF
+  chmod 644 /etc/ssh/ssh_config
+
+  eval "$(ssh-agent -s)"
+
+  cat > ${HOME}/.ssh/deploy_key << EOF
+${GITHUB_DEPLOY_PRIVATE_KEY}
+EOF
+
+  chmod 600 ${HOME}/.ssh/deploy_key
+  ssh-add ${HOME}/.ssh/deploy_key
+fi
+
 set +e
 OUTPUT=$(sh -c "terraform validate $*" 2>&1)
 SUCCESS=$?

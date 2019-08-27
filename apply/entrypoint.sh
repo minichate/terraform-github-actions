@@ -40,14 +40,25 @@ EOF
 fi
 
 if [[ ! -z "$GITHUB_DEPLOY_PRIVATE_KEY" ]]; then
-  mkdir -p ~/.ssh
-  ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
+  mkdir -p ${HOME}/.ssh
+  ssh-keyscan -t rsa github.com >> /etc/ssh/ssh_known_hosts
+  chmod 644 /etc/ssh/ssh_known_hosts
+
+  cat > /etc/ssh/ssh_config << EOF
+Host *
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null
+EOF
+  chmod 644 /etc/ssh/ssh_config
+
   eval "$(ssh-agent -s)"
-  cat > ~/.ssh/deploy_key << EOF
+
+  cat > ${HOME}/.ssh/deploy_key << EOF
 ${GITHUB_DEPLOY_PRIVATE_KEY}
 EOF
-  chmod 600 ~/.ssh/deploy_key
-  ssh-add ~/.ssh/deploy_key
+
+  chmod 600 ${HOME}/.ssh/deploy_key
+  ssh-add ${HOME}/.ssh/deploy_key
 fi
 
 if [[ ! -z "$GOOGLE_CLOUD_KEYFILE_JSON" ]]; then
