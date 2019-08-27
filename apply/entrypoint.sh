@@ -39,6 +39,24 @@ credentials "${TF_ACTION_TFE_HOSTNAME:-app.terraform.io}" {
 EOF
 fi
 
+if [[ ! -z "$GITHUB_DEPLOY_PRIVATE_KEY" ]]; then
+  mkdir -p ~/.ssh
+  eval "$(ssh-agent -s)"
+  cat > ~/.ssh/deploy_key << EOF
+${GITHUB_DEPLOY_PRIVATE_KEY}
+EOF
+  chmod 600 ~/.ssh/deploy_key
+  ssh-add ~/.ssh/deploy_key
+fi
+
+if [[ ! -z "$GOOGLE_CLOUD_KEYFILE_JSON" ]]; then
+  cat > /tmp/GOOGLE_CLOUD_KEYFILE_JSON << EOF
+${GOOGLE_CLOUD_KEYFILE_JSON}
+EOF
+  export GOOGLE_CREDENTIALS=/tmp/GOOGLE_CLOUD_KEYFILE_JSON
+fi
+
+
 if [[ ! -z "$TF_ACTION_WORKSPACE" ]] && [[ "$TF_ACTION_WORKSPACE" != "default" ]]; then
   terraform workspace select "$TF_ACTION_WORKSPACE"
 fi
