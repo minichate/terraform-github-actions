@@ -73,7 +73,7 @@ if [[ ! -z "$TF_ACTION_WORKSPACE" ]] && [[ "$TF_ACTION_WORKSPACE" != "default" ]
 fi
 
 set +e
-OUTPUT=$(sh -c "TF_IN_AUTOMATION=true terraform plan -input=false $*" 2>&1)
+OUTPUT=$(sh -c "TF_IN_AUTOMATION=true terraform plan -var-file=${TF_VAR_FILE} -no-color -input=false $*" 2>&1)
 SUCCESS=$?
 echo "$OUTPUT"
 set -e
